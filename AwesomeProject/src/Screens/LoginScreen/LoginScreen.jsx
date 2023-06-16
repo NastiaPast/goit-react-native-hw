@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, TextInput, ImageBackground , StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  ImageBackground,
+  StyleSheet,
+} from "react-native";
 import PhotoBg from "../../images/photo-bg.png";
 const LoginScreen = () => {
   return (
@@ -15,7 +21,7 @@ const LoginScreen = () => {
             />
             <TextInput style={styles.input} placeholder="Пароль" />
           </View>
-           <Text style={styles.text}>Показати</Text>
+          <Text style={styles.text}>Показати</Text>
           <Text style={styles.button}>Увійти</Text>
 
           <Text style={styles.registr}>Немає акаунту? Зареєструватися</Text>
@@ -35,19 +41,19 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
 
- overlay: {
-   position: "relative",
-   flex: 0,
-   height: 489,
+  overlay: {
+    position: "relative",
+    flex: 0,
+    height: 489,
     paddingTop: 32,
     paddingLeft: 16,
-   paddingRight: 16,
+    paddingRight: 16,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     backgroundColor: "#fff",
   },
 
-   title: {
+  title: {
     marginBottom: 32,
     letterSpacing: 0.8,
     fontSize: 30,
@@ -76,7 +82,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-     height: 51,
+    height: 51,
     paddingBottom: 16,
     paddingTop: 16,
     marginBottom: 16,
@@ -97,7 +103,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
   },
 
-   text: {
+  text: {
     position: "absolute",
     right: 30,
     bottom: 283,
