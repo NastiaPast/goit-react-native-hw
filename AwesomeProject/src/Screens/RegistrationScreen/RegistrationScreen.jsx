@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -5,33 +6,156 @@ import {
   StyleSheet,
   ImageBackground,
   Text,
+  Keyboard,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import PhotoBg from "../../images/photo-bg.png";
 import AddImg from "../../images/add.png";
+
 const RegistrationScreen = () => {
+  const [login, setLogin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoginFocused, setLoginFocused] = useState(false);
+  const [isEmailFocused, setEmailFocused] = useState(false);
+  const [isPasswordFocused, setPasswordFocused] = useState(false);
+  const [overlayHeight, setOverlayHeight] = useState(549);
+
+  const handleLoginChange = (text) => {
+    setLogin(text);
+  };
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
+  };
+
+  const handlePasswordChange = (text) => {
+    setPassword(text);
+  };
+
+  const handleSubmit = () => {
+    if (!login || !email || !password) {
+      Alert.alert("Попередження", "Заповніть всі поля!");
+    } else if (!isValidEmail(email)) {
+      Alert.alert("Попередження", "Введіть дійсну адресу електронної пошти");
+    } else {
+      console.log("Login:", login);
+      console.log("Email:", email);
+      console.log("Password:", password);
+      setLogin("");
+      setEmail("");
+      setPassword("");
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  const isValidEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
+  const handleKeyboardShow = (event) => {
+    if (Platform.OS === "ios") {
+      setOverlayHeight(549 + event.endCoordinates.height);
+    } else {
+      setOverlayHeight(549 + 50);
+    }
+  };
+
+  const handleKeyboardHide = () => {
+    setOverlayHeight(549);
+  };
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      handleKeyboardShow
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      handleKeyboardHide
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   return (
-    <View style={styles.container}>
-      <ImageBackground source={PhotoBg} style={styles.background}>
-        <View style={styles.overlay}>
-          <View style={styles.wrap}></View>
-          <Image source={AddImg} style={styles.image}></Image>
-          <Text style={styles.title}>Реєстрація</Text>
-          <View style={styles.wrapper}>
-            <TextInput style={styles.input} placeholder="Логін"></TextInput>
-            <TextInput
-              style={styles.input}
-              placeholder="Адреса електронної пошти"
-            ></TextInput>
-            <TextInput style={styles.input} placeholder="Пароль"></TextInput>
-          </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : null}
+      enabled
+    >
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.container}>
+          <ImageBackground source={PhotoBg} style={styles.background}>
+            <View style={[styles.overlay, { height: overlayHeight }]}>
+              <View style={styles.wrap}></View>
+              <Image source={AddImg} style={styles.image} />
+              <Text style={styles.title}>Реєстрація</Text>
+              <View style={styles.wrapper}>
+                <TextInput
+                  style={[styles.input, isLoginFocused && styles.inputFocused]}
+                  placeholder="Логін"
+                  onChangeText={handleLoginChange}
+                  value={login}
+                  onFocus={() => setLoginFocused(true)}
+                  onBlur={() => setLoginFocused(false)}
+                />
+                <TextInput
+                  style={[styles.input, isEmailFocused && styles.inputFocused]}
+                  placeholder="Адреса електронної пошти"
+                  onChangeText={handleEmailChange}
+                  value={email}
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
+                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={[
+                      styles.passwordInput,
+                      isPasswordFocused && styles.inputFocused,
+                    ]}
+                    placeholder="Пароль"
+                    secureTextEntry={!showPassword}
+                    onChangeText={handlePasswordChange}
+                    value={password}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                  />
+                  <TouchableOpacity
+                    style={styles.showPasswordButton}
+                    onPress={togglePasswordVisibility}
+                  >
+                    <Text style={styles.showPasswordButtonText}>
+                      {showPassword ? "Приховати" : "Показати"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-          <Text style={styles.text}>Показати</Text>
-
-          <Text style={styles.button}> Зареєструватись </Text>
-          <Text style={styles.entrance}>Вже є акаунт? Увійти</Text>
+              <TouchableOpacity onPress={handleSubmit}>
+                <Text style={styles.button}>Зареєструватись</Text>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.entrance}>Вже є акаунт? Увійти</Text>
+              </TouchableOpacity>
+            </View>
+          </ImageBackground>
         </View>
-      </ImageBackground>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -40,6 +164,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+
   background: {
     flex: 1,
     justifyContent: "flex-end",
@@ -48,7 +173,6 @@ const styles = StyleSheet.create({
   overlay: {
     position: "relative",
     flex: 0,
-    height: 549,
     paddingTop: 92,
     paddingLeft: 16,
     paddingRight: 16,
@@ -87,6 +211,7 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 43,
   },
+
   input: {
     height: 50,
     paddingLeft: 16,
@@ -99,6 +224,45 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     color: "black",
     fontSize: 16,
+  },
+
+  inputFocused: {
+    borderColor: "#FF6C00",
+  },
+
+  passwordContainer: {
+    position: "relative",
+  },
+
+  passwordInput: {
+    height: 50,
+    paddingLeft: 16,
+    paddingBottom: 15,
+    paddingTop: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E8E8E8",
+    backgroundColor: "#F6F6F6",
+    borderStyle: "solid",
+    color: "black",
+    fontSize: 16,
+    paddingRight: 40,
+  },
+
+  showPasswordButton: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+
+  showPasswordButtonText: {
+    color: "#1B4371",
+    fontSize: 16,
+    lineHeight: 19,
+    fontFamily: "Roboto-Regular",
   },
 
   button: {
@@ -115,16 +279,6 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
   },
 
-  text: {
-    position: "absolute",
-    right: 30,
-    bottom: 217,
-    color: "#1B4371",
-    fontSize: 16,
-    lineHeight: 19,
-    fontFamily: "Roboto-Regular",
-  },
-
   entrance: {
     color: "#1B4371",
     fontSize: 16,
@@ -133,4 +287,5 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
   },
 });
+
 export default RegistrationScreen;
