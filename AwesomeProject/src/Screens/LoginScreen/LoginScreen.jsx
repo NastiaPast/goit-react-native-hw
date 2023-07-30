@@ -13,6 +13,7 @@ import {
   Platform,
 } from "react-native";
 import PhotoBg from "../../images/photo-bg.png";
+import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ const LoginScreen = () => {
   const [passwordBorderColor, setPasswordBorderColor] = useState("#E8E8E8");
   const [showPassword, setShowPassword] = useState(false);
   const [overlayHeight, setOverlayHeight] = useState(489);
+  const navigation = useNavigation();
 
   const handleEmailChange = (text) => {
     setEmail(text);
@@ -37,10 +39,7 @@ const LoginScreen = () => {
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert(
-        "Попередження",
-        "Введіть дійсну адресу електронної пошти."
-      );
+      Alert.alert("Попередження", "Введіть дійсну адресу електронної пошти.");
       return;
     }
 
@@ -48,6 +47,7 @@ const LoginScreen = () => {
     console.log("Password:", password);
     setEmail("");
     setPassword("");
+    navigation.navigate("Home", { screen: "Posts" });
   };
 
   const isValidEmail = (email) => {
@@ -134,11 +134,21 @@ const LoginScreen = () => {
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>Увійти</Text>
               </TouchableOpacity>
-              <TouchableOpacity>
-                <Text style={styles.registr}>
-                  Немає акаунту? Зареєструватися
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.registrContainer}>
+                <Text style={styles.registr}> Немає акаунту?</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("Registration")}
+                >
+                  <Text
+                    style={[
+                      styles.registr,
+                      { marginLeft: 8, textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Зареєструватися
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </KeyboardAvoidingView>
         </ImageBackground>
@@ -235,6 +245,11 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     textAlign: "center",
     fontFamily: "Roboto-Regular",
+  },
+  registrContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import PhotoBg from "../../images/photo-bg.png";
 import AddImg from "../../images/add.png";
+import { useNavigation } from "@react-navigation/native";
 
 const RegistrationScreen = () => {
   const [login, setLogin] = useState("");
@@ -25,6 +26,7 @@ const RegistrationScreen = () => {
   const [isEmailFocused, setEmailFocused] = useState(false);
   const [isPasswordFocused, setPasswordFocused] = useState(false);
   const [overlayHeight, setOverlayHeight] = useState(549);
+  const navigation = useNavigation();
 
   const handleLoginChange = (text) => {
     setLogin(text);
@@ -50,6 +52,7 @@ const RegistrationScreen = () => {
       setLogin("");
       setEmail("");
       setPassword("");
+      navigation.navigate("Home", { screen: "PostsScreen" });
     }
   };
 
@@ -148,9 +151,19 @@ const RegistrationScreen = () => {
               <TouchableOpacity onPress={handleSubmit}>
                 <Text style={styles.button}>Зареєструватись</Text>
               </TouchableOpacity>
-              <TouchableOpacity>
-                <Text style={styles.entrance}>Вже є акаунт? Увійти</Text>
-              </TouchableOpacity>
+              <View style={styles.entranceContainer}>
+                <Text style={styles.entrance}>Вже є акаунт?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                  <Text
+                    style={[
+                      styles.entrance,
+                      { marginLeft: 8, textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Увійти
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </ImageBackground>
         </View>
@@ -285,6 +298,11 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     textAlign: "center",
     fontFamily: "Roboto-Regular",
+  },
+  entranceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
