@@ -1,6 +1,7 @@
 import "react-native-gesture-handler";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
+import { Text, StyleSheet } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useFonts } from "expo-font";
 import RegistrationScreen from "./src/Screens/RegistrationScreen/RegistrationScreen";
@@ -22,7 +23,10 @@ export default function App() {
   }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={styles.tabOptions}
+      >
         <Stack.Screen
           name="Registration"
           component={RegistrationScreen}
@@ -56,7 +60,40 @@ export default function App() {
             },
           }}
         />
+        <Stack.Screen
+          name="Map"
+          component={MapScreen}
+          options={{
+            headerTitle: () => <Text style={styles.headerTitle}>Мапа</Text>,
+            transitionSpec: {
+              open: { animation: "timing", config: { duration: 0 } },
+              close: { animation: "timing", config: { duration: 0 } },
+            },
+          }}
+        />
+        <Stack.Screen
+          name="Comments"
+          component={CommentsScreen}
+          options={{
+            headerTitle: () => (
+              <Text style={styles.headerTitle}>Коментарі</Text>
+            ),
+            transitionSpec: {
+              open: { animation: "timing", config: { duration: 0 } },
+              close: { animation: "timing", config: { duration: 0 } },
+            },
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+const styles = StyleSheet.create({
+  tabOptions: { headerTitleAlign: "center" },
+  headerTitle: {
+    marginBottom: 11,
+    marginTop: 11,
+    fontFamily: "Roboto-Medium",
+    fontSize: 17,
+  },
+});

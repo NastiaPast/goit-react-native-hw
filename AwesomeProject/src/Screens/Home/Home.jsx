@@ -5,17 +5,23 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import PostsScreen from "../PostsScreen/PostsScreen";
 import CreatePostsScreen from "../CreatePostsScreen/CreatePostsScreen";
 import ProfileScreen from "../ProfileScreen/ProfileScreen";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute
+} from "@react-navigation/native";
 
 const Tabs = createBottomTabNavigator();
 
 const Home = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
   return (
     <Tabs.Navigator screenOptions={styles.tabNav}>
       <Tabs.Screen
         name="PostsScreen"
         component={PostsScreen}
+        initialParams={{ userData: route.params?.userData || null }}
         options={{
           headerTitle: () => <Text style={styles.mainTitle}>Публікації</Text>,
 
@@ -36,6 +42,7 @@ const Home = () => {
         name="CreatePostsScreen"
         component={CreatePostsScreen}
         options={{
+          tabBarStyle: { display: "none" },
           headerTitle: () => (
             <Text style={styles.mainTitle}>Створити публікацію</Text>
           ),

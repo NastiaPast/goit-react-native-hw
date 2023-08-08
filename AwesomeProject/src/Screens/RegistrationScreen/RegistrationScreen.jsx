@@ -16,6 +16,7 @@ import {
 import PhotoBg from "../../images/photo-bg.png";
 import AddImg from "../../images/add.png";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 
 const RegistrationScreen = () => {
   const [login, setLogin] = useState("");
@@ -26,6 +27,8 @@ const RegistrationScreen = () => {
   const [isEmailFocused, setEmailFocused] = useState(false);
   const [isPasswordFocused, setPasswordFocused] = useState(false);
   const [overlayHeight, setOverlayHeight] = useState(549);
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const navigation = useNavigation();
 
   const handleLoginChange = (text) => {
@@ -41,18 +44,22 @@ const RegistrationScreen = () => {
   };
 
   const handleSubmit = () => {
-    if (!login || !email || !password) {
+    if (!login || !email || !password || !selectedImage) {
       Alert.alert("Попередження", "Заповніть всі поля!");
     } else if (!isValidEmail(email)) {
       Alert.alert("Попередження", "Введіть дійсну адресу електронної пошти");
     } else {
-      console.log("Login:", login);
-      console.log("Email:", email);
-      console.log("Password:", password);
-      setLogin("");
-      setEmail("");
-      setPassword("");
-      navigation.navigate("Home", { screen: "PostsScreen" });
+      const userData = {
+        login,
+        email,
+        password,
+        selectedImage,
+      };
+
+      navigation.navigate("Home", {
+        screen: "PostsScreen",
+        params: { userData },
+      });
     }
   };
 
@@ -79,6 +86,31 @@ const RegistrationScreen = () => {
   const handleKeyboardHide = () => {
     setOverlayHeight(549);
   };
+
+  const handleImageSelection = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("Дозвіл на доступ до медіа-бібліотеки відхилено.");
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        setSelectedImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error selecting image:", error);
+    }
+  };
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -104,8 +136,19 @@ const RegistrationScreen = () => {
         <View style={styles.container}>
           <ImageBackground source={PhotoBg} style={styles.background}>
             <View style={[styles.overlay, { height: overlayHeight }]}>
-              <View style={styles.wrap}></View>
-              <Image source={AddImg} style={styles.image} />
+              <View style={styles.wrap}>
+                {selectedImage ? (
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={styles.selectedImage}
+                  />
+                ) : (
+                  <TouchableOpacity onPress={handleImageSelection}>
+                    <Image source={AddImg} style={styles.image} />
+                  </TouchableOpacity>
+                )}
+              </View>
+
               <Text style={styles.title}>Реєстрація</Text>
               <View style={styles.wrapper}>
                 <TextInput
@@ -177,6 +220,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  selectedImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+    backgroundColor: "#F6F6F6",
+    alignSelf: "center",
+    marginBottom: 32,
+    resizeMode: "cover",
+  },
 
   background: {
     flex: 1,
@@ -206,8 +258,9 @@ const styles = StyleSheet.create({
 
   image: {
     position: "absolute",
-    top: "5%",
-    left: "67%",
+    top: "7%",
+    left: "89%",
+    transform: [{ translateY: 80 }],
   },
 
   title: {
